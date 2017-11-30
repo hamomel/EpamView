@@ -9,6 +9,18 @@
     tools:context="com.hamom.epamview.ui.MainActivity"
     tools:layout_editor_absoluteY="81dp">
 
+    <com.hamom.epamview.ui.custom_views.RoundCheckBox
+        android:id="@+id/checkbox"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:color="@android:color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <com.hamom.epamview.ui.custom_views.RippleTextView
         android:id="@+id/rippleTextView2"
         android:layout_width="72dp"

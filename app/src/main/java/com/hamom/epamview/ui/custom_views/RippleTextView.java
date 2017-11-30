@@ -25,7 +25,6 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
 
     private static final int DEFAULT_CIRCLE_WIDTH_DP = 2;
     private static final int RIPPLE_ALPHA = 50;
-    private int mSize;
     private int mMainColor;
     private int mRippleColor;
     private Paint mRipplePaint;
@@ -63,9 +62,9 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
         setTextColor(mMainColor);
         setGravity(Gravity.CENTER);
         setClickable(true);
-        setTextSize(mSize / 6);
+        setTextSize(getHeight() / 6);
 
-        mCircleRadius = mSize / 2 - mCircleWidth;
+        mCircleRadius = getHeight() / 2 - mCircleWidth;
 
         mRipplePaint = new Paint();
         mRipplePaint.setColor(mRippleColor);
@@ -79,6 +78,7 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
 
         mAnimator = ValueAnimator.ofFloat(0, mCircleRadius);
         mAnimator.setInterpolator(new AccelerateInterpolator());
+        mAnimator.setDuration(200);
         mAnimator.addUpdateListener(getListener());
     }
 
@@ -113,10 +113,14 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
         int width = MeasureSpec.getSize(widthMeasureSpec);
 
         int min = Math.min(height, width);
-        mSize = min;
         int w = resolveSizeAndState(min, widthMeasureSpec, 0);
         int h = resolveSizeAndState(min, heightMeasureSpec, 0);
         setMeasuredDimension(w, h);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
         init();
     }
 
