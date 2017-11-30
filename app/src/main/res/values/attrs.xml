@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <declare-styleable name="RippleTextView">
+        <attr name="mainColor" format="color"/>
+        <attr name="rippleColor" format="color"/>
+        <attr name="circleWidth" format="dimension"/>
+    </declare-styleable>
 
 </resources>
