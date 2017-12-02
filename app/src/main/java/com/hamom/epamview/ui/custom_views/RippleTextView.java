@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -29,10 +31,12 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
     private int mRippleColor;
     private Paint mRipplePaint;
     private Paint mCirclePaint;
+    private Path mPath;
     private float mCircleRadius;
     private float mRippleRadius;
     private float mCircleWidth;
     private ValueAnimator mAnimator;
+    private RectF mRect;
 
     public RippleTextView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -80,6 +84,9 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
         mAnimator.setInterpolator(new AccelerateInterpolator());
         mAnimator.setDuration(200);
         mAnimator.addUpdateListener(getListener());
+
+        mRect = new RectF(getY(), getX(), getY() + getWidth(), getX() + getHeight());
+        mPath.addOval(mRect, Path.Direction.CCW);
     }
 
     public int getMainColor() {
@@ -134,6 +141,7 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
 
     @Override
     protected void onDraw(Canvas canvas) {
+        canvas.clipPath(mPath);
         canvas.drawCircle(getWidth()/2, getHeight()/2, mRippleRadius, mRipplePaint);
         canvas.drawCircle(getWidth()/2, getHeight()/2, mCircleRadius, mCirclePaint);
         super.onDraw(canvas);
