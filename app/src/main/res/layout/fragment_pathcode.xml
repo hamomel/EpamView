@@ -67,6 +67,7 @@
         <TableRow>
 
             <com.hamom.epamview.ui.custom_views.RippleTextView
+                android:id="@+id/one"
                 style="@style/PasscodeButtonStyle"
                 android:text="1"
                 />
@@ -137,6 +138,7 @@
     </TableLayout>
 
     <TextView
+        android:id="@+id/delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
