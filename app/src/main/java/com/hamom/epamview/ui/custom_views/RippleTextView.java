@@ -12,19 +12,22 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 
+import com.hamom.epamview.BuildConfig;
 import com.hamom.epamview.R;
+import com.hamom.epamview.utils.ConstantManager;
 
 /**
  * Created by hamom on 29.11.17.
  */
 
 public class RippleTextView extends android.support.v7.widget.AppCompatTextView {
-
+    private static String TAG = ConstantManager.TAG_PREFIX + "RippleTextView: ";
     private static final int DEFAULT_CIRCLE_WIDTH_DP = 2;
     private static final int RIPPLE_ALPHA = 50;
     private int mMainColor;
@@ -34,6 +37,10 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
     private Path mPath;
     private float mCircleRadius;
     private float mRippleRadius;
+    private float mCircleX;
+    private float mCircleY;
+    private float mRippleX;
+    private float mRippleY;
     private float mCircleWidth;
     private ValueAnimator mAnimator;
     private RectF mRect;
@@ -69,6 +76,8 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
         setTextSize(getHeight() / 6);
 
         mCircleRadius = getHeight() / 2 - mCircleWidth;
+        mCircleX = getWidth() / 2;
+        mCircleY = getHeight() / 2;
 
         mRipplePaint = new Paint();
         mRipplePaint.setColor(mRippleColor);
@@ -142,8 +151,8 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.clipPath(mPath);
-        canvas.drawCircle(getWidth()/2, getHeight()/2, mRippleRadius, mRipplePaint);
-        canvas.drawCircle(getWidth()/2, getHeight()/2, mCircleRadius, mCirclePaint);
+        canvas.drawCircle(mRippleX, mRippleY, mRippleRadius, mRipplePaint);
+        canvas.drawCircle(mCircleX, mCircleY, mCircleRadius, mCirclePaint);
         super.onDraw(canvas);
     }
 
@@ -151,6 +160,7 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                calculateRippleCenter(event.getX(), event.getY());
                 mAnimator.start();
                 return true;
             case MotionEvent.ACTION_UP:
@@ -159,5 +169,13 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
                 default:
                     return super.onTouchEvent(event);
         }
+    }
+
+    private void calculateRippleCenter(float x, float y) {
+        if (BuildConfig.DEBUG) Log.d(TAG, "calculateRippleCenter x: " + x + " y: " + y);
+
+
+        mRippleX = mCircleX;
+        mRippleY = mCircleY;
     }
 }

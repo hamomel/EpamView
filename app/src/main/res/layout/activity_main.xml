@@ -1,63 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    tools:context="com.hamom.epamview.ui.MainActivity"
-    tools:layout_editor_absoluteY="81dp">
+    >
 
-    <com.hamom.epamview.ui.custom_views.RoundCheckBox
-        android:id="@+id/checkbox"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:color="@android:color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+    <FrameLayout
+        android:id="@+id/main_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <com.hamom.epamview.ui.custom_views.RippleTextView
-        android:id="@+id/rippleTextView2"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:text="3"
-        app:circleWidth="1dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/rippleTextView"
-        app:layout_constraintTop_toTopOf="@+id/rippleTextView"
-        app:mainColor="@android:color/black"
-        app:rippleColor="@android:color/black"/>
+    </FrameLayout>
 
-    <com.hamom.epamview.ui.custom_views.RippleTextView
-        android:id="@+id/rippleTextView"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:text="2"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/rippleTextView2"
-        app:layout_constraintStart_toEndOf="@+id/rippleTextView3"
-        app:layout_constraintTop_toTopOf="parent"
-        app:mainColor="@android:color/black"
-        app:rippleColor="@android:color/black"/>
-
-    <com.hamom.epamview.ui.custom_views.RippleTextView
-        android:id="@+id/rippleTextView3"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:text="1"
-        app:layout_constraintEnd_toStartOf="@+id/rippleTextView"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/rippleTextView"
-        app:mainColor="@android:color/black"
-        app:rippleColor="@android:color/black"/>
-
-</android.support.constraint.ConstraintLayout>
+</FrameLayout>
