@@ -34,7 +34,7 @@ import java.util.List;
 public class PasscodeView extends ViewGroup {
     private static String TAG = ConstantManager.TAG_PREFIX + "PasscodeView: ";
     private String mPasscode = "";
-    private String mUserInput = "";
+    private String mUserInput = "55";
 
     private TextView mTitle;
     private TextView mError;
@@ -43,25 +43,17 @@ public class PasscodeView extends ViewGroup {
     private RippleTextView[] mButtons = new RippleTextView[10];
     private List<RoundCheckBox> mCheckBoxes = new ArrayList<>();
 
-    @ColorInt
-    private int mMainColor;
-    @ColorInt
-    private int mErrorColor;
-    @ColorInt
-    private int mRippleColor;
+    @ColorInt private int mMainColor;
+    @ColorInt private int mErrorColor;
+    @ColorInt private int mRippleColor;
 
-    @Px
-    private int mPaddingTop;
-    @Px
-    private int mPaddingBottom;
-    @Px
-    private int mPaddingHorizontal;
-    @Px
-    private int mPaddingInner;
-    @Px
-    private int mCheckBoxHeight;
-    @Px
-    private int mButtonSize;
+    @Px private int mPaddingTop;
+    @Px private int mPaddingBottom;
+    @Px private int mPaddingHorizontal;
+    @Px private int mPaddingInner;
+    @Px private int mCheckBoxHeight;
+    @Px private int mButtonSize;
+    private int mCheckBoxMargine;
 
     public PasscodeView(Context context) {
         super(context);
@@ -120,6 +112,7 @@ public class PasscodeView extends ViewGroup {
         mPaddingInner = dpToPx(16);
         mCheckBoxHeight = dpToPx(24);
         mButtonSize = dpToPx(72);
+        mCheckBoxMargine = dpToPx(8);
 
         // Init views
         mTitle = new TextView(context);
@@ -144,8 +137,8 @@ public class PasscodeView extends ViewGroup {
         addView(mDelete);
 
         mCheckBoxLayout = new LinearLayout(context);
-//        mCheckBoxLayout.setMinimumHeight(mCheckBoxHeight);
         mCheckBoxLayout.setGravity(Gravity.CENTER);
+        mCheckBoxLayout.setOrientation(LinearLayout.HORIZONTAL);
         addView(mCheckBoxLayout);
 
         for (int i = 0; i < 10; i++) {
@@ -158,8 +151,6 @@ public class PasscodeView extends ViewGroup {
         button.setText(String.valueOf(number));
         button.setMainColor(mMainColor);
         button.setRippleColor(mRippleColor);
-        button.setHapticFeedbackEnabled(true);
-        button.setClickable(true);
         button.setOnClickListener(v -> onButtonClick(((TextView) v).getText()));
         addView(button);
         mButtons[number] = button;
@@ -168,19 +159,20 @@ public class PasscodeView extends ViewGroup {
 
     public void setPasscode(int passcode) {
         mPasscode = String.valueOf(passcode);
-        if (mPasscode.length() > 8) {
-            throw new IllegalArgumentException("Passcode length mustn't be greater then 8 digits. Now it's: " + mPasscode);
+        if (mPasscode.length() > 6) {
+            throw new IllegalArgumentException("Passcode length mustn't be greater then 8 digits. Now it's: " + mPasscode.length());
         }
         initCheckBoxes();
     }
 
     private void initCheckBoxes() {
         for (int i = 0; i < mPasscode.length(); i++) {
-            RoundCheckBox checkBox = new RoundCheckBox(getContext());
+            RoundCheckBox checkBox = new RoundCheckBox(mCheckBoxLayout.getContext());
             checkBox.setColor(mMainColor);
-            checkBox.setWidth(mCheckBoxHeight);
-            checkBox.setHeight(mCheckBoxHeight);
-//            mCheckBoxLayout.addView(checkBox);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mCheckBoxLayout.getLayoutParams());
+            params.setMargins(mCheckBoxMargine, 0, mCheckBoxMargine, 0);
+            checkBox.setLayoutParams(params);
+            mCheckBoxLayout.addView(checkBox);
             mCheckBoxes.add(checkBox);
         }
 
@@ -215,7 +207,7 @@ public class PasscodeView extends ViewGroup {
         measureChild(mTitle, specWidth, heightMeasureSpec);
         measureChild(mError, specWidth, heightMeasureSpec);
         measureChild(mDelete, specWidth, heightMeasureSpec);
-        measureChild(mCheckBoxLayout, specWidth, heightMeasureSpec);
+        measureChild(mCheckBoxLayout, maxWidth, heightMeasureSpec);
 
         for (RippleTextView button : mButtons) {
             button.setWidth(mButtonSize);
@@ -247,12 +239,11 @@ public class PasscodeView extends ViewGroup {
 
         heightUsed += mTitle.getMeasuredHeight() + mPaddingInner;
 
-        mCheckBoxLayout.setBackgroundColor(mMainColor);
         mCheckBoxLayout.layout(
                 mPaddingHorizontal,
                 heightUsed,
                 width - mPaddingHorizontal,
-                mCheckBoxLayout.getHeight() + heightUsed
+                mCheckBoxLayout.getMeasuredHeight() + heightUsed
         );
 
         heightUsed += mCheckBoxLayout.getMeasuredHeight() + mPaddingHorizontal;

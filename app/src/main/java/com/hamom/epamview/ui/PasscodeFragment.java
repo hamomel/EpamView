@@ -33,7 +33,7 @@ public class PasscodeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_pathcode, container, false);
         mPasscodeView = view.findViewById(R.id.passcode_view);
-        mPasscodeView.setPasscode(1234);
+        mPasscodeView.setPasscode(123456);
 
         return view;
     }

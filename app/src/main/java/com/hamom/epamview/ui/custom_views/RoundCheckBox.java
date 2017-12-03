@@ -41,15 +41,12 @@ public class RoundCheckBox extends android.support.v7.widget.AppCompatCheckBox {
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.RoundCheckBox);
 
         int defColor = ContextCompat.getColor(context, android.R.color.white);
-        float circleWidth;
         try {
             mColor = array.getColor(R.styleable.RoundCheckBox_color, defColor);
-            circleWidth = array.getDimension(R.styleable.RoundCheckBox_circleWidth, 0);
+            mCircleWidth = (int) array.getDimension(R.styleable.RoundCheckBox_circleWidth, 0);
         } finally {
             array.recycle();
         }
-
-        mCircleWidth = circleWidth > 0 ? (int) circleWidth : dpToPx(DEFAULT_CIRCLE_WIDTH_DP);
     }
 
     @Px
@@ -77,14 +74,10 @@ public class RoundCheckBox extends android.support.v7.widget.AppCompatCheckBox {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int height = MeasureSpec.getSize(heightMeasureSpec);
-        int width = MeasureSpec.getSize(widthMeasureSpec);
 
-        int min = Math.min(height, width);
-        int w = resolveSizeAndState(min, widthMeasureSpec, 0);
-        int h = resolveSizeAndState(min, heightMeasureSpec, 0);
-        setMeasuredDimension(w, h);
+        // Make it square
+        int min = Math.min(heightMeasureSpec, widthMeasureSpec);
+        super.onMeasure(min, min);
     }
 
     @Override
@@ -95,6 +88,7 @@ public class RoundCheckBox extends android.support.v7.widget.AppCompatCheckBox {
 
     private void init() {
         setClickable(false);
+        mCircleWidth = mCircleWidth > 0 ? mCircleWidth : dpToPx(DEFAULT_CIRCLE_WIDTH_DP);
         mRadius = getHeight() / 2 - mCircleWidth;
         mCenterY = getHeight() / 2;
         mCenterX = getWidth() / 2;

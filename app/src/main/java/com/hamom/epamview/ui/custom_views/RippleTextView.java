@@ -53,10 +53,14 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
 
     public RippleTextView(Context context) {
         super(context);
+        setClickable(true);
+        setHapticFeedbackEnabled(true);
     }
 
     public RippleTextView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        setClickable(true);
+        setHapticFeedbackEnabled(true);
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.RippleTextView);
 
         try {
@@ -79,13 +83,12 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
     private void init() {
         setTextColor(mMainColor);
         setGravity(Gravity.CENTER);
-        setClickable(true);
         setTextSize(getHeight() / 6);
 
         mCircleWidth = mCircleWidth > 0 ? mCircleWidth : dpToPx(DEFAULT_CIRCLE_WIDTH_DP);
-        mCircleRadius = getHeight() / 2 - mCircleWidth;
-        mCircleX = getWidth() / 2;
-        mCircleY = getHeight() / 2;
+        mCircleRadius = getMeasuredHeight() / 2 - mCircleWidth;
+        mCircleX = getMeasuredWidth() / 2;
+        mCircleY = getMeasuredHeight() / 2;
 
         mRipplePaint = new Paint();
         mRipplePaint.setColor(mRippleColor);
@@ -133,14 +136,9 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int height = MeasureSpec.getSize(heightMeasureSpec);
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-        int modeW = MeasureSpec.getMode(widthMeasureSpec);
-        int modeH = MeasureSpec.getMode(heightMeasureSpec);
 
+        // Make it square
         int min = Math.min(heightMeasureSpec, widthMeasureSpec);
-        widthMeasureSpec = MeasureSpec.makeMeasureSpec(min, modeW);
-        heightMeasureSpec = MeasureSpec.makeMeasureSpec(min, modeH);
         super.onMeasure(min, min);
     }
 
