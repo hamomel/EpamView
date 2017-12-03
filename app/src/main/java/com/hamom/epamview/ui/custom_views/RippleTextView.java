@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
@@ -19,7 +20,6 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 
 import com.hamom.epamview.R;
@@ -73,8 +73,7 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
         }
     }
 
-    @Px
-    private int dpToPx(@Dimension(unit = Dimension.DP) int dp) {
+    @Px private int dpToPx(@Dimension(unit = Dimension.DP) int dp) {
         final Resources resources = getResources();
         final DisplayMetrics displayMetrics = resources.getDisplayMetrics();
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
@@ -84,6 +83,11 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
         setTextColor(mMainColor);
         setGravity(Gravity.CENTER);
         setTextSize(getHeight() / 6);
+
+        // Turn off hardware acceleration to let canvas.clipPath() work
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            setLayerType(LAYER_TYPE_SOFTWARE, null);
+        }
 
         mCircleWidth = mCircleWidth > 0 ? mCircleWidth : dpToPx(DEFAULT_CIRCLE_WIDTH_DP);
         mCircleRadius = getMeasuredHeight() / 2 - mCircleWidth;
@@ -100,9 +104,9 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
         mCirclePaint.setStyle(Paint.Style.STROKE);
         mCirclePaint.setStrokeWidth(mCircleWidth);
 
-        mAnimator = ValueAnimator.ofFloat(0, mCircleRadius);
+        mAnimator = new ValueAnimator();
         mAnimator.setInterpolator(new AccelerateInterpolator());
-        mAnimator.setDuration(200);
+        mAnimator.setDuration(100);
         mAnimator.addUpdateListener(getListener());
 
         RectF rect = new RectF(0, 0, getWidth(), getHeight());
@@ -151,8 +155,7 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
     @NonNull
     private ValueAnimator.AnimatorUpdateListener getListener() {
         return animation -> {
-            // TODO: 02.12.17 calculate radius factor dynamical
-            mRippleRadius = (int) ((Float)animation.getAnimatedValue() * 2);
+            mRippleRadius = ((Float) animation.getAnimatedValue()).intValue();
             invalidate();
         };
     }
@@ -167,22 +170,37 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!isInCircle(event.getX(), event.getY())) {
+            return false;
+        }
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 performClick();
-                calculateRippleCenter(event.getX(), event.getY());
+                calculateRipple(event.getX(), event.getY());
                 mAnimator.start();
                 return true;
             case MotionEvent.ACTION_UP:
                 mAnimator.reverse();
                 return true;
-                default:
-                    return super.onTouchEvent(event);
+            default:
+                return super.onTouchEvent(event);
         }
     }
 
-    private void calculateRippleCenter(float x, float y) {
+    private boolean isInCircle(float x, float y) {
+        double radDist = getTouchEventDist(x, y);
+        return radDist < mCircleRadius;
+    }
 
+    private double getTouchEventDist(float x, float y) {
+        float xDist = Math.abs(x - mCircleX);
+        float yDist = Math.abs(y - mCircleY);
+        return Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2));
+    }
+
+    private void calculateRipple(float x, float y) {
+        int maxRippleRadius = (int) (mCircleRadius + getTouchEventDist(x, y));
+        mAnimator.setFloatValues(0, maxRippleRadius);
         mRippleX = (int) x;
         mRippleY = (int) y;
     }

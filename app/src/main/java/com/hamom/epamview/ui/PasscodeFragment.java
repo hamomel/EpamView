@@ -1,21 +1,15 @@
 package com.hamom.epamview.ui;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.hamom.epamview.R;
 import com.hamom.epamview.ui.custom_views.PasscodeView;
-import com.hamom.epamview.ui.custom_views.RoundCheckBox;
 import com.hamom.epamview.ui.custom_views.SecondActivity;
 
 /**
@@ -23,8 +17,6 @@ import com.hamom.epamview.ui.custom_views.SecondActivity;
  */
 
 public class PasscodeFragment extends Fragment {
-
-    private PasscodeView mPasscodeView;
 
     public static PasscodeFragment getInstance() {
         return new PasscodeFragment();
@@ -34,9 +26,9 @@ public class PasscodeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_pathcode, container, false);
-        mPasscodeView = view.findViewById(R.id.passcode_view);
-        mPasscodeView.setPasscode(1234);
-        mPasscodeView.setCallback(() -> showNextScreen());
+        PasscodeView passcodeView = view.findViewById(R.id.passcode_view);
+        passcodeView.setPasscode(1234);
+        passcodeView.setCallback(() -> showNextScreen());
 
         return view;
     }
@@ -44,6 +36,7 @@ public class PasscodeFragment extends Fragment {
     private void showNextScreen() {
         Intent intent = new Intent(getActivity(), SecondActivity.class);
         startActivity(intent);
+        getActivity().finish();
     }
 
 }

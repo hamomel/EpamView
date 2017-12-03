@@ -2,19 +2,18 @@ package com.hamom.epamview.ui.custom_views;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.os.Build;
+import android.os.Handler;
+import android.os.Vibrator;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Dimension;
 import android.support.annotation.Px;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -22,7 +21,6 @@ import android.view.animation.LinearInterpolator;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.hamom.epamview.BuildConfig;
 import com.hamom.epamview.R;
 import com.hamom.epamview.utils.ConstantManager;
 
@@ -38,6 +36,7 @@ public class PasscodeView extends ViewGroup {
     private String mPasscode = "";
     private StringBuffer mUserInput = new StringBuffer("");
     private PasscodeCallback mCallback;
+    private Vibrator mVibrator;
 
     private TextView mTitle;
     private TextView mError;
@@ -54,9 +53,8 @@ public class PasscodeView extends ViewGroup {
     @Px private int mPaddingBottom;
     @Px private int mPaddingHorizontal;
     @Px private int mPaddingInner;
-    @Px private int mCheckBoxHeight;
     @Px private int mButtonSize;
-    @Px private int mCheckBoxMargine;
+    @Px private int mCheckBoxMargin;
 
     public PasscodeView(Context context) {
         super(context);
@@ -103,19 +101,15 @@ public class PasscodeView extends ViewGroup {
             setBackgroundColor(color);
         }
 
-        // Turn off hardware acceleration to let canvas.clipPath() work
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            setLayerType(LAYER_TYPE_SOFTWARE, null);
-        }
+        mVibrator = ((Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE));
 
         // Prepare paddings
         mPaddingTop = dpToPx(24);
         mPaddingBottom = dpToPx(16);
         mPaddingHorizontal = dpToPx(16);
         mPaddingInner = dpToPx(16);
-        mCheckBoxHeight = dpToPx(24);
         mButtonSize = dpToPx(72);
-        mCheckBoxMargine = dpToPx(8);
+        mCheckBoxMargin = dpToPx(8);
 
         // Init views
         mTitle = new TextView(context);
@@ -178,7 +172,7 @@ public class PasscodeView extends ViewGroup {
             RoundCheckBox checkBox = new RoundCheckBox(mCheckBoxLayout.getContext());
             checkBox.setColor(mMainColor);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mCheckBoxLayout.getLayoutParams());
-            params.setMargins(mCheckBoxMargine, 0, mCheckBoxMargine, 0);
+            params.setMargins(mCheckBoxMargin, 0, mCheckBoxMargin, 0);
             checkBox.setLayoutParams(params);
             mCheckBoxLayout.addView(checkBox);
             mCheckBoxes.add(checkBox);
@@ -274,14 +268,9 @@ public class PasscodeView extends ViewGroup {
 
 
         // Layout keyboard
-        int keyboardMaxWidth = width - mPaddingHorizontal * 2;
         int keyboardMaxHeight = height - heightUsed - mDelete.getMeasuredHeight() - mPaddingInner - mPaddingBottom;
-        int keyMaxWidth = (keyboardMaxWidth - mPaddingInner * 2) / 3;
-        int keyMaxHeight = (keyboardMaxHeight - mPaddingInner * 3) / 4;
-        int keySize = Math.min(keyMaxHeight, keyMaxWidth);
-        int keyboardRealWidth = keySize * 3 + mPaddingHorizontal * 2;
-        int keyoardRealHeight = mButtonSize * 4 + mPaddingInner * 3;
-        int keyTop = heightUsed + (keyboardMaxHeight - keyoardRealHeight) / 2;
+        int keyboardRealHeight = mButtonSize * 4 + mPaddingInner * 3;
+        int keyTop = heightUsed + (keyboardMaxHeight - keyboardRealHeight) / 2;
         int keyboardLeft = centerHorizontal - mButtonSize - mPaddingInner - mButtonSize / 2;
         int keyLeft = keyboardLeft;
 
@@ -317,8 +306,11 @@ public class PasscodeView extends ViewGroup {
     }
 
     private void onButtonClick(CharSequence text) {
+        mVibrator.vibrate(40);
         hideError();
-        mUserInput.append(text);
+        if (mUserInput.length() < mPasscode.length()) {
+            mUserInput.append(text);
+        }
 
         checkCheckBoxes();
         if (mUserInput.length() == mPasscode.length()) {
@@ -328,7 +320,7 @@ public class PasscodeView extends ViewGroup {
 
     private void checkPasscode() {
        if (mUserInput.toString().equals(mPasscode)){
-           mCallback.onCorrectPssscode();
+           mCallback.onCorrectPasscode();
        } else {
            mUserInput.delete(0, mUserInput.length());
            showError();
@@ -341,6 +333,9 @@ public class PasscodeView extends ViewGroup {
     }
 
     private void showErrorAnimation() {
+        mVibrator.vibrate(100);
+        new Handler().postDelayed(() -> mVibrator.vibrate(100), 100);
+
         float x = mCheckBoxLayout.getX();
         float[] values = new float[] {x, x - dpToPx(6), x + dpToPx(12), x - dpToPx(6), x};
         ObjectAnimator animator = ObjectAnimator.ofFloat(mCheckBoxLayout, "x", values);
@@ -360,6 +355,7 @@ public class PasscodeView extends ViewGroup {
     }
 
     private void onDeleteClick() {
+        mVibrator.vibrate(40);
         if (mUserInput.length() > 0) {
             mUserInput.deleteCharAt(mUserInput.length() - 1);
             checkCheckBoxes();
@@ -367,6 +363,6 @@ public class PasscodeView extends ViewGroup {
     }
 
     public interface PasscodeCallback {
-        void onCorrectPssscode();
+        void onCorrectPasscode();
     }
 }
