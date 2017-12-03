@@ -1,13 +1,17 @@
 package com.hamom.epamview.ui.custom_views;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.support.annotation.ColorInt;
+import android.support.annotation.Dimension;
+import android.support.annotation.Px;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.view.WindowManager;
+import android.util.TypedValue;
 
 import com.hamom.epamview.R;
 
@@ -17,15 +21,16 @@ import com.hamom.epamview.R;
 
 public class RoundCheckBox extends android.support.v7.widget.AppCompatCheckBox {
 
-
-    private static final int DEFAULT_CIRCLE_WIDTH_DP = 2;
+    @Dimension(unit = Dimension.DP) private static final int DEFAULT_CIRCLE_WIDTH_DP = 2;
     private Paint mUnCheckedPaint;
     private Paint mCheckedPaint;
-    private int mColor;
-    private float mCircleWidth;
-    private float mRadius;
-    private int mCenterX;
-    private int mCenterY;
+
+    @ColorInt private int mColor;
+
+    @Px private int mCircleWidth;
+    @Px private int mRadius;
+    @Px private int mCenterX;
+    @Px private int mCenterY;
 
     public RoundCheckBox(Context context) {
         super(context);
@@ -39,18 +44,35 @@ public class RoundCheckBox extends android.support.v7.widget.AppCompatCheckBox {
         float circleWidth;
         try {
             mColor = array.getColor(R.styleable.RoundCheckBox_color, defColor);
-            circleWidth = array.getDimension(R.styleable.RoundCheckBox_width, 0);
+            circleWidth = array.getDimension(R.styleable.RoundCheckBox_circleWidth, 0);
         } finally {
             array.recycle();
         }
 
-        mCircleWidth = circleWidth > 0 ? circleWidth : DEFAULT_CIRCLE_WIDTH_DP * getScale(context);
+        mCircleWidth = circleWidth > 0 ? (int) circleWidth : dpToPx(DEFAULT_CIRCLE_WIDTH_DP);
     }
 
-    private float getScale(Context context) {
-        DisplayMetrics metrics = new DisplayMetrics();
-        ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(metrics);
-        return metrics.density;
+    @Px
+    private int dpToPx(@Dimension(unit = Dimension.DP) int dp) {
+        final Resources resources = getResources();
+        final DisplayMetrics displayMetrics = resources.getDisplayMetrics();
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
+    }
+
+    public int getColor() {
+        return mColor;
+    }
+
+    public void setColor(int color) {
+        mColor = color;
+    }
+
+    public int getCircleWidth() {
+        return mCircleWidth;
+    }
+
+    public void setCircleWidth(int circleWidth) {
+        mCircleWidth = circleWidth;
     }
 
     @Override

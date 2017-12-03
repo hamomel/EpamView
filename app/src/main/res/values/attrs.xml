@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="mainColor" format="color"/>
+    <attr name="rippleColor" format="color"/>
+    <attr name="circleWidth" format="dimension"/>
+
     <declare-styleable name="RippleTextView">
-        <attr name="mainColor" format="color"/>
-        <attr name="rippleColor" format="color"/>
-        <attr name="circleWidth" format="dimension"/>
+        <attr name="mainColor"/>
+        <attr name="rippleColor" />
+        <attr name="circleWidth" />
     </declare-styleable>
 
     <declare-styleable name="RoundCheckBox">
         <attr name="color" format="color"/>
-        <attr name="width" format="dimension"/>
+        <attr name="circleWidth" />
+    </declare-styleable>
+
+    <declare-styleable name="PasscodeView">
+        <attr name="mainColor" />
+        <attr name="rippleColor" />
+        <attr name="errorColor" format="color"/>
     </declare-styleable>
 
 </resources>

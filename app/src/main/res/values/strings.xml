@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">EpamView</string>
-    <string name="enter_passcode">Enter Passcode</string>
-    <string name="wrong_passcode">Wrong passcode. Try again.</string>
+    <string name="enter_passcode_title">Enter Passcode</string>
+    <string name="wrong_passcode_message">Wrong passcode. Try again.</string>
     <string name="delete">Delete</string>
 
 </resources>
