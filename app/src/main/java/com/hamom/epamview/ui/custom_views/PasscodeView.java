@@ -1,5 +1,9 @@
 package com.hamom.epamview.ui.custom_views;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -14,6 +18,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -31,7 +36,7 @@ import java.util.List;
 public class PasscodeView extends ViewGroup {
     private static String TAG = ConstantManager.TAG_PREFIX + "PasscodeView: ";
     private String mPasscode = "";
-    private StringBuffer mUserInput = new StringBuffer("115");
+    private StringBuffer mUserInput = new StringBuffer("");
     private PasscodeCallback mCallback;
 
     private TextView mTitle;
@@ -326,13 +331,28 @@ public class PasscodeView extends ViewGroup {
            mCallback.onCorrectPssscode();
        } else {
            mUserInput.delete(0, mUserInput.length());
-           checkCheckBoxes();
            showError();
        }
     }
 
     private void showError() {
         mError.setVisibility(VISIBLE);
+        showErrorAnimation();
+    }
+
+    private void showErrorAnimation() {
+        float x = mCheckBoxLayout.getX();
+        float[] values = new float[] {x, x - dpToPx(6), x + dpToPx(12), x - dpToPx(6), x};
+        ObjectAnimator animator = ObjectAnimator.ofFloat(mCheckBoxLayout, "x", values);
+        animator.setDuration(300);
+        animator.setInterpolator(new LinearInterpolator());
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                checkCheckBoxes();
+            }
+        });
+        animator.start();
     }
 
     private void hideError() {
