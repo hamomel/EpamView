@@ -103,6 +103,13 @@ public class RoundCheckBox extends android.support.v7.widget.AppCompatCheckBox {
         mUnCheckedPaint.setStrokeWidth(mCircleWidth);
     }
 
+    // onDraw() doesn't work on API24 without it
+    @Override
+    public void setChecked(boolean checked) {
+        super.setChecked(checked);
+        invalidate();
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
 

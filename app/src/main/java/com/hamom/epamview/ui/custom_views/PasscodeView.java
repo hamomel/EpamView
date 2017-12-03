@@ -6,7 +6,6 @@ import android.content.res.TypedArray;
 import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Dimension;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.Px;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
@@ -14,11 +13,9 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.hamom.epamview.BuildConfig;
 import com.hamom.epamview.R;
@@ -34,7 +31,8 @@ import java.util.List;
 public class PasscodeView extends ViewGroup {
     private static String TAG = ConstantManager.TAG_PREFIX + "PasscodeView: ";
     private String mPasscode = "";
-    private String mUserInput = "55";
+    private StringBuffer mUserInput = new StringBuffer("115");
+    private PasscodeCallback mCallback;
 
     private TextView mTitle;
     private TextView mError;
@@ -53,7 +51,7 @@ public class PasscodeView extends ViewGroup {
     @Px private int mPaddingInner;
     @Px private int mCheckBoxHeight;
     @Px private int mButtonSize;
-    private int mCheckBoxMargine;
+    @Px private int mCheckBoxMargine;
 
     public PasscodeView(Context context) {
         super(context);
@@ -125,6 +123,7 @@ public class PasscodeView extends ViewGroup {
         mError.setText(R.string.wrong_passcode_message);
         mError.setTextColor(mErrorColor);
         mError.setTextSize(16);
+        mError.setVisibility(INVISIBLE);
         addView(mError);
 
         mDelete = new TextView(context);
@@ -163,6 +162,10 @@ public class PasscodeView extends ViewGroup {
             throw new IllegalArgumentException("Passcode length mustn't be greater then 8 digits. Now it's: " + mPasscode.length());
         }
         initCheckBoxes();
+    }
+
+    public void setCallback(PasscodeCallback callback) {
+        mCallback = callback;
     }
 
     private void initCheckBoxes() {
@@ -309,10 +312,41 @@ public class PasscodeView extends ViewGroup {
     }
 
     private void onButtonClick(CharSequence text) {
-        Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
+        hideError();
+        mUserInput.append(text);
+
+        checkCheckBoxes();
+        if (mUserInput.length() == mPasscode.length()) {
+            checkPasscode();
+        }
+    }
+
+    private void checkPasscode() {
+       if (mUserInput.toString().equals(mPasscode)){
+           mCallback.onCorrectPssscode();
+       } else {
+           mUserInput.delete(0, mUserInput.length());
+           checkCheckBoxes();
+           showError();
+       }
+    }
+
+    private void showError() {
+        mError.setVisibility(VISIBLE);
+    }
+
+    private void hideError() {
+        mError.setVisibility(INVISIBLE);
     }
 
     private void onDeleteClick() {
-        Toast.makeText(getContext(), "delete", Toast.LENGTH_SHORT).show();
+        if (mUserInput.length() > 0) {
+            mUserInput.deleteCharAt(mUserInput.length() - 1);
+            checkCheckBoxes();
+        }
+    }
+
+    public interface PasscodeCallback {
+        void onCorrectPssscode();
     }
 }
