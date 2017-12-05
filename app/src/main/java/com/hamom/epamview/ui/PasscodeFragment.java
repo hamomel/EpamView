@@ -31,7 +31,7 @@ public class PasscodeFragment extends Fragment {
         passcodeView.setPasscode(1234);
         passcodeView.setCallback(() -> showNextScreen());
         passcodeView.setUncheckedDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.linkedin));
-        passcodeView.setCheckedDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.vk));
+//        passcodeView.setCheckedDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.vk));
 
         return view;
     }

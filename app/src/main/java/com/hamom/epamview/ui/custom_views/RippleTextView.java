@@ -11,7 +11,6 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Dimension;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Px;
 import android.support.v4.content.ContextCompat;
@@ -55,12 +54,15 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
         super(context);
         setClickable(true);
         setHapticFeedbackEnabled(true);
+        initAnimator();
     }
 
     public RippleTextView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         setClickable(true);
         setHapticFeedbackEnabled(true);
+        initAnimator();
+
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.RippleTextView);
 
         try {
@@ -73,45 +75,14 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
         }
     }
 
-    @Px private int dpToPx(@Dimension(unit = Dimension.DP) int dp) {
-        final Resources resources = getResources();
-        final DisplayMetrics displayMetrics = resources.getDisplayMetrics();
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
-    }
-
-    private void init() {
-        setTextColor(mMainColor);
-        setGravity(Gravity.CENTER);
-        setTextSize(getHeight() / 6);
-
-        // Turn off hardware acceleration to let canvas.clipPath() work
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            setLayerType(LAYER_TYPE_SOFTWARE, null);
-        }
-
-        mCircleWidth = mCircleWidth > 0 ? mCircleWidth : dpToPx(DEFAULT_CIRCLE_WIDTH_DP);
-        mCircleRadius = getMeasuredHeight() / 2 - mCircleWidth;
-        mCircleX = getMeasuredWidth() / 2;
-        mCircleY = getMeasuredHeight() / 2;
-
-        mRipplePaint = new Paint();
-        mRipplePaint.setColor(mRippleColor);
-        mRipplePaint.setStyle(Paint.Style.FILL);
-        mRipplePaint.setAlpha(RIPPLE_ALPHA);
-
-        mCirclePaint = new Paint();
-        mCirclePaint.setColor(mMainColor);
-        mCirclePaint.setStyle(Paint.Style.STROKE);
-        mCirclePaint.setStrokeWidth(mCircleWidth);
-
+    private void initAnimator() {
         mAnimator = new ValueAnimator();
         mAnimator.setInterpolator(new AccelerateInterpolator());
         mAnimator.setDuration(100);
-        mAnimator.addUpdateListener(getListener());
-
-        RectF rect = new RectF(0, 0, getWidth(), getHeight());
-        mPath = new Path();
-        mPath.addOval(rect, Path.Direction.CCW);
+        mAnimator.addUpdateListener(animation -> {
+            mRippleRadius = ((Float) animation.getAnimatedValue()).intValue();
+            invalidate();
+        });
     }
 
     public int getMainColor() {
@@ -152,12 +123,40 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
         init();
     }
 
-    @NonNull
-    private ValueAnimator.AnimatorUpdateListener getListener() {
-        return animation -> {
-            mRippleRadius = ((Float) animation.getAnimatedValue()).intValue();
-            invalidate();
-        };
+    private void init() {
+        setTextColor(mMainColor);
+        setGravity(Gravity.CENTER);
+        setTextSize(getHeight() / 6);
+
+        // Turn off hardware acceleration to let canvas.clipPath() work
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            setLayerType(LAYER_TYPE_SOFTWARE, null);
+        }
+
+        mCircleWidth = mCircleWidth > 0 ? mCircleWidth : dpToPx(DEFAULT_CIRCLE_WIDTH_DP);
+        mCircleRadius = getMeasuredHeight() / 2 - mCircleWidth;
+        mCircleX = getMeasuredWidth() / 2;
+        mCircleY = getMeasuredHeight() / 2;
+
+        mRipplePaint = new Paint();
+        mRipplePaint.setColor(mRippleColor);
+        mRipplePaint.setStyle(Paint.Style.FILL);
+        mRipplePaint.setAlpha(RIPPLE_ALPHA);
+
+        mCirclePaint = new Paint();
+        mCirclePaint.setColor(mMainColor);
+        mCirclePaint.setStyle(Paint.Style.STROKE);
+        mCirclePaint.setStrokeWidth(mCircleWidth);
+
+        RectF rect = new RectF(0, 0, getWidth(), getHeight());
+        mPath = new Path();
+        mPath.addOval(rect, Path.Direction.CCW);
+    }
+
+    @Px private int dpToPx(@Dimension(unit = Dimension.DP) int dp) {
+        final Resources resources = getResources();
+        final DisplayMetrics displayMetrics = resources.getDisplayMetrics();
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, displayMetrics);
     }
 
     @Override
