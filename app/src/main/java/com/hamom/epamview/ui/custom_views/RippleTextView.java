@@ -163,7 +163,7 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.clipPath(mPath);
-        canvas.drawCircle(mRippleX, mRippleY, mRippleRadius, mRipplePaint);
+        canvas.drawCircle(mCircleX, mCircleY, mRippleRadius, mRipplePaint);
         canvas.drawCircle(mCircleX, mCircleY, mCircleRadius, mCirclePaint);
         super.onDraw(canvas);
     }
@@ -199,7 +199,7 @@ public class RippleTextView extends android.support.v7.widget.AppCompatTextView 
     }
 
     private void calculateRipple(float x, float y) {
-        int maxRippleRadius = (int) (mCircleRadius + getTouchEventDist(x, y));
+        int maxRippleRadius = mCircleRadius;
         mAnimator.setFloatValues(0, maxRippleRadius);
         mRippleX = (int) x;
         mRippleY = (int) y;
