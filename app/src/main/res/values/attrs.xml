@@ -10,15 +10,12 @@
         <attr name="circleWidth" />
     </declare-styleable>
 
-    <declare-styleable name="RoundCheckBox">
-        <attr name="color" format="color"/>
-        <attr name="circleWidth" />
-    </declare-styleable>
-
     <declare-styleable name="PasscodeView">
         <attr name="mainColor" />
         <attr name="rippleColor" />
         <attr name="errorColor" format="color"/>
+        <attr name="checkedDrawable" format="reference"/>
+        <attr name="uncheckedDrawable" format="reference"/>
     </declare-styleable>
 
 </resources>

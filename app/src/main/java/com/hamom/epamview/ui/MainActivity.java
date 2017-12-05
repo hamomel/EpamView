@@ -3,6 +3,7 @@ package com.hamom.epamview.ui;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 
 import com.hamom.epamview.R;
 

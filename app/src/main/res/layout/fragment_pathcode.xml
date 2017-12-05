@@ -5,6 +5,9 @@
     android:id="@+id/passcode_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background">
+    android:background="@drawable/background"
+    app:checkedDrawable="@drawable/ic_checkbox_checked_24dp"
+    app:uncheckedDrawable="@drawable/ic_checkbox_unchecked_24dp"
+    >
 
 </com.hamom.epamview.ui.custom_views.PasscodeView>

@@ -2,15 +2,18 @@ package com.hamom.epamview.ui.custom_views;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Dimension;
 import android.support.annotation.Px;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -18,6 +21,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -43,18 +47,60 @@ public class PasscodeView extends ViewGroup {
     private TextView mDelete;
     private LinearLayout mCheckBoxLayout;
     private RippleTextView[] mButtons = new RippleTextView[10];
-    private List<RoundCheckBox> mCheckBoxes = new ArrayList<>();
+    private List<ImageView> mCheckBoxes = new ArrayList<>();
 
-    @ColorInt private int mMainColor;
-    @ColorInt private int mErrorColor;
-    @ColorInt private int mRippleColor;
+    @ColorInt
+    private int mMainColor;
+    @ColorInt
+    private int mErrorColor;
+    @ColorInt
+    private int mRippleColor;
 
-    @Px private int mPaddingTop;
-    @Px private int mPaddingBottom;
-    @Px private int mPaddingHorizontal;
-    @Px private int mPaddingInner;
-    @Px private int mButtonSize;
-    @Px private int mCheckBoxMargin;
+    @Px
+    private int mPaddingTop;
+    @Px
+    private int mPaddingBottom;
+    @Px
+    private int mPaddingHorizontal;
+    @Px
+    private int mPaddingInner;
+    @Px
+    private int mButtonSize;
+    @Px
+    private int mCheckBoxMargin;
+    @Px
+    private int mCheckboxSize;
+
+    private Drawable mCheckedDrawable;
+    private Drawable mUncheckedDrawable;
+
+    public Drawable getCheckedDrawable() {
+        return mCheckedDrawable;
+    }
+
+    public void setCheckedDrawable(Drawable checkedDrawable) {
+        mCheckedDrawable = checkedDrawable;
+    }
+
+    public Drawable getUncheckedDrawable() {
+        return mUncheckedDrawable;
+    }
+
+    public void setUncheckedDrawable(Drawable uncheckedDrawable) {
+        mUncheckedDrawable = uncheckedDrawable;
+    }
+
+    public void setPasscode(int passcode) {
+        mPasscode = String.valueOf(passcode);
+        if (mPasscode.length() > 6) {
+            throw new IllegalArgumentException("Passcode length mustn't be greater then 8 digits. Now it's: " + mPasscode.length());
+        }
+        initCheckBoxes();
+    }
+
+    public void setCallback(PasscodeCallback callback) {
+        mCallback = callback;
+    }
 
     public PasscodeView(Context context) {
         super(context);
@@ -89,6 +135,12 @@ public class PasscodeView extends ViewGroup {
                 mMainColor = array.getColor(R.styleable.RippleTextView_mainColor, defColor);
                 mRippleColor = array.getColor(R.styleable.RippleTextView_rippleColor, defColor);
                 mErrorColor = array.getColor(R.styleable.PasscodeView_errorColor, defErrorColor);
+
+                // Use VectorDrawableCompat to retreive drawable on pre lollipop
+                int checkedDrawableRes = array.getResourceId(R.styleable.PasscodeView_checkedDrawable, -1);
+                mCheckedDrawable = VectorDrawableCompat.create(getResources(), checkedDrawableRes, null);
+                int uncheckedDrawableRes = array.getResourceId(R.styleable.PasscodeView_uncheckedDrawable, -1);
+                mUncheckedDrawable = VectorDrawableCompat.create(getResources(), uncheckedDrawableRes, null);
             } finally {
                 array.recycle();
             }
@@ -96,9 +148,20 @@ public class PasscodeView extends ViewGroup {
     }
 
     private void init(Context context) {
+        // Animate layout changes
+        setLayoutTransition(new LayoutTransition());
+
         if (getBackground() == null) {
             int color = ContextCompat.getColor(context, android.R.color.background_dark);
             setBackgroundColor(color);
+        }
+
+        if (mCheckedDrawable == null) {
+            mCheckedDrawable = ContextCompat.getDrawable(context, R.drawable.passcode_selected_dot);
+        }
+
+        if (mUncheckedDrawable == null) {
+            mUncheckedDrawable = ContextCompat.getDrawable(context, R.drawable.passcode_unselected_dot);
         }
 
         mVibrator = ((Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE));
@@ -110,6 +173,7 @@ public class PasscodeView extends ViewGroup {
         mPaddingInner = dpToPx(16);
         mButtonSize = dpToPx(72);
         mCheckBoxMargin = dpToPx(8);
+        mCheckboxSize = dpToPx(24);
 
         // Init views
         mTitle = new TextView(context);
@@ -154,25 +218,13 @@ public class PasscodeView extends ViewGroup {
         mButtons[number] = button;
     }
 
-
-    public void setPasscode(int passcode) {
-        mPasscode = String.valueOf(passcode);
-        if (mPasscode.length() > 6) {
-            throw new IllegalArgumentException("Passcode length mustn't be greater then 8 digits. Now it's: " + mPasscode.length());
-        }
-        initCheckBoxes();
-    }
-
-    public void setCallback(PasscodeCallback callback) {
-        mCallback = callback;
-    }
-
     private void initCheckBoxes() {
         for (int i = 0; i < mPasscode.length(); i++) {
-            RoundCheckBox checkBox = new RoundCheckBox(mCheckBoxLayout.getContext());
-            checkBox.setColor(mMainColor);
+            ImageView checkBox = new ImageView(mCheckBoxLayout.getContext());
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mCheckBoxLayout.getLayoutParams());
             params.setMargins(mCheckBoxMargin, 0, mCheckBoxMargin, 0);
+            params.height = mCheckboxSize;
+            params.width = mCheckboxSize;
             checkBox.setLayoutParams(params);
             mCheckBoxLayout.addView(checkBox);
             mCheckBoxes.add(checkBox);
@@ -183,14 +235,21 @@ public class PasscodeView extends ViewGroup {
 
     // Set checkboxes checked depend on number of char in user input
     private void checkCheckBoxes() {
-        for (RoundCheckBox checkBox : mCheckBoxes) {
-            if (mUserInput.length() > 0) {
-                boolean checked = mCheckBoxes.indexOf(checkBox) < mUserInput.length();
-                checkBox.setChecked(checked);
-            } else {
-                checkBox.setChecked(false);
+        for (ImageView checkBox : mCheckBoxes) {
+            if (mUserInput.length() > 0 && mCheckBoxes.indexOf(checkBox) < mUserInput.length()) {
+                setChecked(checkBox);
+                continue;
             }
+            setUnchecked(checkBox);
         }
+    }
+
+    private void setUnchecked(ImageView checkBox) {
+        checkBox.setImageDrawable(mUncheckedDrawable);
+    }
+
+    private void setChecked(ImageView checkBox) {
+        checkBox.setImageDrawable(mCheckedDrawable);
     }
 
     @Override
@@ -319,12 +378,12 @@ public class PasscodeView extends ViewGroup {
     }
 
     private void checkPasscode() {
-       if (mUserInput.toString().equals(mPasscode)){
-           mCallback.onCorrectPasscode();
-       } else {
-           mUserInput.delete(0, mUserInput.length());
-           showError();
-       }
+        if (mUserInput.toString().equals(mPasscode)) {
+            mCallback.onCorrectPasscode();
+        } else {
+            mUserInput.delete(0, mUserInput.length());
+            showError();
+        }
     }
 
     private void showError() {
@@ -337,7 +396,7 @@ public class PasscodeView extends ViewGroup {
         new Handler().postDelayed(() -> mVibrator.vibrate(100), 100);
 
         float x = mCheckBoxLayout.getX();
-        float[] values = new float[] {x, x - dpToPx(6), x + dpToPx(12), x - dpToPx(6), x};
+        float[] values = new float[]{x, x - dpToPx(6), x + dpToPx(12), x - dpToPx(6), x};
         ObjectAnimator animator = ObjectAnimator.ofFloat(mCheckBoxLayout, "x", values);
         animator.setDuration(300);
         animator.setInterpolator(new LinearInterpolator());
