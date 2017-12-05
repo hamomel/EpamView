@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,8 @@ public class PasscodeFragment extends Fragment {
         PasscodeView passcodeView = view.findViewById(R.id.passcode_view);
         passcodeView.setPasscode(1234);
         passcodeView.setCallback(() -> showNextScreen());
+        passcodeView.setUncheckedDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.linkedin));
+        passcodeView.setCheckedDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.vk));
 
         return view;
     }

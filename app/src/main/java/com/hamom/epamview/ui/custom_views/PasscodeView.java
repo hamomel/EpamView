@@ -80,14 +80,17 @@ public class PasscodeView extends ViewGroup {
 
     public void setCheckedDrawable(Drawable checkedDrawable) {
         mCheckedDrawable = checkedDrawable;
+        checkCheckBoxes();
     }
 
     public Drawable getUncheckedDrawable() {
         return mUncheckedDrawable;
+
     }
 
     public void setUncheckedDrawable(Drawable uncheckedDrawable) {
         mUncheckedDrawable = uncheckedDrawable;
+        checkCheckBoxes();
     }
 
     public void setPasscode(int passcode) {
@@ -138,9 +141,14 @@ public class PasscodeView extends ViewGroup {
 
                 // Use VectorDrawableCompat to retreive drawable on pre lollipop
                 int checkedDrawableRes = array.getResourceId(R.styleable.PasscodeView_checkedDrawable, -1);
-                mCheckedDrawable = VectorDrawableCompat.create(getResources(), checkedDrawableRes, null);
+                if (checkedDrawableRes > 0) {
+                    mCheckedDrawable = VectorDrawableCompat.create(getResources(), checkedDrawableRes, null);
+                }
+
                 int uncheckedDrawableRes = array.getResourceId(R.styleable.PasscodeView_uncheckedDrawable, -1);
-                mUncheckedDrawable = VectorDrawableCompat.create(getResources(), uncheckedDrawableRes, null);
+                if (uncheckedDrawableRes > 0) {
+                    mUncheckedDrawable = VectorDrawableCompat.create(getResources(), uncheckedDrawableRes, null);
+                }
             } finally {
                 array.recycle();
             }
