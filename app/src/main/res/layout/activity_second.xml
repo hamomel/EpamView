@@ -5,6 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.hamom.epamview.ui.custom_views.SecondActivity">
+    tools:context="com.hamom.epamview.ui.SecondActivity">
 
 </android.support.constraint.ConstraintLayout>

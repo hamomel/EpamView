@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 
 import com.hamom.epamview.R;
 import com.hamom.epamview.ui.custom_views.PasscodeView;
-import com.hamom.epamview.ui.custom_views.SecondActivity;
 
 /**
  * Created by hamom on 30.11.17.

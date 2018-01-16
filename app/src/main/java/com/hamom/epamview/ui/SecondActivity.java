@@ -1,4 +1,4 @@
-package com.hamom.epamview.ui.custom_views;
+package com.hamom.epamview.ui;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
