@@ -49,27 +49,17 @@ public class PasscodeView extends ViewGroup {
     private RippleTextView[] mButtons = new RippleTextView[10];
     private List<ImageView> mCheckBoxes = new ArrayList<>();
 
-    @ColorInt
-    private int mMainColor;
-    @ColorInt
-    private int mErrorColor;
-    @ColorInt
-    private int mRippleColor;
+    @ColorInt private int mMainColor;
+    @ColorInt private int mErrorColor;
+    @ColorInt private int mRippleColor;
 
-    @Px
-    private int mPaddingTop;
-    @Px
-    private int mPaddingBottom;
-    @Px
-    private int mPaddingHorizontal;
-    @Px
-    private int mPaddingInner;
-    @Px
-    private int mButtonSize;
-    @Px
-    private int mCheckBoxMargin;
-    @Px
-    private int mCheckboxSize;
+    @Px private int mPaddingTop;
+    @Px private int mPaddingBottom;
+    @Px private int mPaddingHorizontal;
+    @Px private int mPaddingInner;
+    @Px private int mButtonSize;
+    @Px private int mCheckBoxMargin;
+    @Px private int mCheckboxSize;
 
     private Drawable mCheckedDrawable;
     private Drawable mUncheckedDrawable;
@@ -174,7 +164,7 @@ public class PasscodeView extends ViewGroup {
 
         mVibrator = ((Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE));
 
-        // Prepare paddings
+        // Prepare sizes
         mPaddingTop = dpToPx(24);
         mPaddingBottom = dpToPx(16);
         mPaddingHorizontal = dpToPx(16);
@@ -216,6 +206,9 @@ public class PasscodeView extends ViewGroup {
         }
     }
 
+    /**
+     * Creates and adds to list a new button
+     */
     private void addButton(Context context, int number) {
         RippleTextView button = new RippleTextView(context);
         button.setText(String.valueOf(number));
@@ -226,6 +219,9 @@ public class PasscodeView extends ViewGroup {
         mButtons[number] = button;
     }
 
+    /**
+     * Creates and adds views to list in quantity depending on the passcode length
+     */
     private void initCheckBoxes() {
         for (int i = 0; i < mPasscode.length(); i++) {
             ImageView checkBox = new ImageView(mCheckBoxLayout.getContext());
@@ -262,12 +258,12 @@ public class PasscodeView extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int specHeight = getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec);
         int specHeightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int specHeight = getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec);
         int specWidthMode = MeasureSpec.getMode(widthMeasureSpec);
         int specWidth = getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
 
-        int maxWidth = specWidth + mPaddingHorizontal * 2;
+        int maxWidth = specWidth - mPaddingHorizontal * 2;
 
         mTitle.setMaxWidth(maxWidth);
         mError.setMaxWidth(maxWidth);
@@ -288,6 +284,7 @@ public class PasscodeView extends ViewGroup {
         heightMeasureSpec = MeasureSpec.makeMeasureSpec(specHeight, specHeightMode);
         setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
     }
+
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
